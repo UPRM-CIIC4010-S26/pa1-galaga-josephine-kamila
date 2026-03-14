@@ -35,7 +35,8 @@ class Program {
         void DrawStartup();
         void DrawPauseScreen();
         void DrawGameOver();
-        void AddScore();
+        void DrawScore();
+        void AddScore(int points);
         void KeyInputs();
         void PlayerReset();
         void Reset();

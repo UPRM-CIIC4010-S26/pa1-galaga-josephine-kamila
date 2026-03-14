@@ -8,13 +8,14 @@ Program::Program() {
 
     Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
             std::pair<float, float>{350, 150}, 
-            new SpEnemy(350, 150)
+            new SpEnemy(350, 150),
         });
 
     Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
             std::pair<float, float>{600, 150}, 
-            new SpEnemy(600, 150)
+            new SpEnemy(600, 150),
         });
+
 
     for (int i = 0; i < 30; i++) {
         float x = 250 + 50 * (i % 10);
@@ -36,6 +37,10 @@ void Program::Update() {
 
     if (!startup && !paused && !gameOver && pauseFrames <= 0) {
         Enemy::ManageEnemies(player->hitBox);
+        if (Enemy::points > 0) {
+            AddScore(Enemy::points);
+            Enemy::points = 0;
+        }
         StdEnemy::attackReset();
         ManageEnemyRespawns();
         player->update();
@@ -64,6 +69,7 @@ void Program::Update() {
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
+
     }
 }
 
@@ -85,6 +91,7 @@ void Program::Draw() {
     if (startup) DrawStartup();
     if (paused) DrawPauseScreen();
     if (gameOver) DrawGameOver();
+    if (!gameOver && !startup && !paused) DrawScore();
 }
 
 void Program::ManageEnemyRespawns() {
@@ -92,9 +99,9 @@ void Program::ManageEnemyRespawns() {
 
     respawnCooldown -= 1;
     if (respawnCooldown <= 0) {
-        respawnCooldown = 1080 - score/5;
-        if (respawnCooldown < 300){
-            respawnCooldown = 300;
+        respawnCooldown = 1000 - score/5;
+        if (respawnCooldown < 60){
+            respawnCooldown = 60;
         }
         for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
             if (!p.second && p.first.second != 150) {
@@ -102,7 +109,6 @@ void Program::ManageEnemyRespawns() {
 
                 if (eType == 1) {
                     p.second = new StEnemy(GetScreenWidth() / 2 - 15, 0, true);
-                    respawnCooldown /= 2;
                 } else {
                     p.second = new StdEnemy(GetScreenWidth() / 2 - 15, 0, true);
                 }
@@ -150,24 +156,20 @@ void Program::DrawGameOver() {
     DrawText("Game Over", (GetScreenWidth() / 2) - 380, 50, 144, WHITE);
     DrawText("Press Enter", (GetScreenWidth() / 2) - 75, GetScreenHeight() / 2, 24, GRAY);
 }
-void Program::DrawScore(){
-    DrawText(TextFormat("Score: %i", score), 20, 20, 24, WHITE);
-}
 void Program:: AddScore() {
     score = score + points;
     if (score >= 1000 && lives < 5) {
         lives++;
-        score -= 1000;
+        livesToAdd--;
     }
 }
+
 void Program::KeyInputs() {
     if ((!gameOver && !startup && IsKeyPressed('P')) || (paused && IsKeyPressed(KEY_ENTER))) paused = !paused;
     if (!paused && !startup && IsKeyPressed('O')) gameOver = !gameOver;
     if (!gameOver && !paused && IsKeyPressed('I')) startup = !startup;
     if (IsKeyPressed('H')) HitBox::drawHitbox = !HitBox::drawHitbox;
-    if (IsKeyPressed('K')){
-        score += 500;
-    }
+    if (IsKeyPressed('K')){ score += 500; }
     if (gameOver && IsKeyPressed(KEY_ENTER)) {
         gameOver = false;
         Reset();
@@ -198,14 +200,15 @@ void Program::Reset(){
     Enemy::enemies.clear();
     StdEnemy::attackInProgress = false;
     player = new Player((GetScreenWidth() / 2) - 15, GetScreenHeight() * 0.75f);
-    respawnCooldown = 1080;
+    respawnCooldown = 900;
     respawns = 0;
     count = 0;
     delay = 0;
     lives = 3;
     score = 0;
+    points = 0;
 
-    //add from program()
+    //from program()
    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
             std::pair<float, float>{350, 150}, 
             new SpEnemy(350, 150)

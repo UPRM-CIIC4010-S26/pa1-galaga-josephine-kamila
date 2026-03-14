@@ -6,13 +6,15 @@ class StEnemy : public Enemy {
         float angle = 90;
 
     public:
-        StEnemy(float x, float y) : Enemy(x, y) { 
+        StEnemy(float x, float y): Enemy(x, y) { 
             this->cooldown = GetRandomValue(90, 600);
+            this->score = 300;
         }
 
-        StEnemy(float x, float y, bool newSpawn) : Enemy(x, y){
+        StEnemy(float x, float y, bool newSpawn): Enemy(x, y){
             this->cooldown = GetRandomValue(120, 600);
             this->spawning = newSpawn;
+            this->score= 300;
         }
 
         void draw() override;
