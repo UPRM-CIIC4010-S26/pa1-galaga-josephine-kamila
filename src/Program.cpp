@@ -156,9 +156,16 @@ void Program::DrawGameOver() {
     DrawText("Game Over", (GetScreenWidth() / 2) - 380, 50, 144, WHITE);
     DrawText("Press Enter", (GetScreenWidth() / 2) - 75, GetScreenHeight() / 2, 24, GRAY);
 }
-void Program:: AddScore() {
-    score = score + points;
-    if (score >= 1000 && lives < 5) {
+void Program:: AddScore(int ) {
+    int oldScore = score;
+    score += points;
+
+    int oldLevel = oldScore / 1000;
+    int newLevel = score / 1000;
+
+    int livesToAdd = newLevel - oldLevel;
+
+    while (livesToAdd > 0 && lives < 5) {
         lives++;
         livesToAdd--;
     }
